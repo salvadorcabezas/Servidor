@@ -2,41 +2,90 @@ package CristoPop.servidor;
 
 import Controlador.ControladorProducto;
 import Controlador.ControladorUsuario;
-import java.sql.*;
+import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class Protocolo {
 
-    Connection conexion = null;
     ControladorUsuario controladorUsuario;
     ControladorProducto controladorProducto;
+    Ventana ventana;
+    
+    boolean enviaImagen=false;
+    boolean cargarArray=true;
+    int numero_paquete=0;
 
-    public Protocolo(Connection conexion) {
-        this.conexion = conexion;
-        controladorUsuario = new ControladorUsuario(conexion);
-        controladorProducto = new ControladorProducto(conexion);
+    public Protocolo(Ventana ventana) {
+        controladorUsuario = new ControladorUsuario();
+        controladorProducto = new ControladorProducto();
+        this.ventana = ventana;
     }
 
     // metodo al que le pasas por parametro un mensaje y te devuelve otro
-    public String processInput(String mensaje) {
+    public String processInput(String mensaje) throws NoSuchAlgorithmException, IOException {
         String[] peticion = mensaje.split("#");
         String theOutput = "";
+        String[] respuesta;
 
         switch (peticion[1]) {
             case "LOGIN":
                 theOutput = controladorUsuario.verificaUsuario(mensaje);
+                respuesta = theOutput.split("#");
+                if (respuesta[1].equals("WELLCOME")) {ventana.areaTexto.append("Usuario logueado: " + respuesta[2] +"\n");} else{ventana.areaTexto.append("Error de logueo: " + peticion[2] + "\n");}
                 break;
             case "GET_PRODUCTS":
-                theOutput = controladorProducto.dameProductos();
+                if (token(peticion[2]).equals(peticion[3])) {
+                    theOutput = controladorProducto.dameProductos();
+                    respuesta = theOutput.split("#");
+                    if (respuesta[1].equals("AVAILABLE_PRODUCTS")) {ventana.areaTexto.append("Usuario: " + peticion[2] +" está visualizando los productos"+"\n");}
+                } else {
+                    theOutput = "PROTOCOLCRISTOPOP1.0#ERROR#CANT_GET_FILES";
+                }
                 break;
             case "GET_ITEM":
-                System.out.println("");
+                if (token(peticion[2]).equals(peticion[3])) {
+                    theOutput = controladorProducto.dameItem(mensaje);
+                    respuesta = theOutput.split("#");
+                    if (respuesta[1].equals("GET_ITEM")) {ventana.areaTexto.append("Usuario: " + peticion[2] +" está visualizando el producto "+respuesta[2]+"\n");}
+                } else {
+                    theOutput = "PROTOCOLCRISTOPOP1.0#ERROR#CANT_GET_ITEM";
+                }
                 break;
             case "PREPARED_TO_RECEIVE":
-                System.out.println("");
+                if (token(peticion[2]).equals(peticion[3])) {
+                    theOutput = controladorProducto.dameImagen(mensaje);
+                }
+                break;
+            case "BUY_PRODUCT":
+                System.out.println("Mensaje recibido");
+                ventana.areaTexto.append("El pobre usuario "+peticion[2]+" intenta comprar un ITEM que no se puede comprar porque aún no he implementado esta pta mierda \n");
                 break;
         }
 
         return theOutput;
+    }
+
+    /*
+        metodo que devuelve hash
+        parametros String login que es el login del usuario autenticado
+     */
+    public String token(String login) throws NoSuchAlgorithmException {
+
+        String sha = null;
+        MessageDigest mensaje = MessageDigest.getInstance("SHA-256");
+
+        mensaje.update(login.getBytes());
+
+        byte[] digest = mensaje.digest();
+        StringBuffer sb = new StringBuffer();
+
+        for (byte b : digest) {
+            sb.append(String.format("%02x", b & 0xff));
+        }
+        sha = sb.toString();
+
+        return sha;
     }
 }
 

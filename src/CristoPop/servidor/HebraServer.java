@@ -10,10 +10,14 @@ public class HebraServer implements Runnable {
 
     private Socket socket = null;
     Ventana ventana;
+    PrintWriter out;
+    BufferedReader in;
 
-    public HebraServer(Socket socket, Ventana ventana) {
+    public HebraServer(Socket socket, Ventana ventana) throws IOException {
         this.socket = socket;
         this.ventana = ventana;
+        out = new PrintWriter(socket.getOutputStream(), true);
+        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
     }
 
     @Override
@@ -21,9 +25,7 @@ public class HebraServer implements Runnable {
         String userAddress = socket.getRemoteSocketAddress().toString(); // METODO PARA OBTENER HOST Y PUERTO
         //System.out.println("Usuario conectado: " + userAddress); // imprimo por pantalla el host y puerto
         ventana.areaTexto.append("Usuario conectado: " + userAddress + "\n");
-        try (
-                PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));) {
+        try {
             String inputLine, outputLine;
             Protocolo protocolo = new Protocolo(ventana);
 
@@ -42,5 +44,10 @@ public class HebraServer implements Runnable {
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(HebraServer.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    // CREAR METODO QUE ENVIE MENSAJE A CLIENTE
+    public void itemASidoComprado(String codigoProducto, String userLogin) {
+        out.println("PROTOCOLCRISTOPOP1.0#BUY_ACCEPTED#" + codigoProducto + "#" + userLogin);
     }
 }

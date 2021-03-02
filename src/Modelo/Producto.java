@@ -1,6 +1,7 @@
 package Modelo;
 
 import CristoPop.servidor.Conexion;
+import CristoPop.servidor.Servidor;
 import java.io.BufferedInputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -295,6 +296,57 @@ public class Producto extends Conexion {
             enviaImagen = false;
             imagen_base64.clear();
         }
+
+        return mensaje;
+    }
+
+    /*
+        metodo que devuelve String con los datos de un objeto producto
+        parametros: String mensaje del tipo PROTOCOLCRISTOPOP1.0#BUY_PRODUCT#<user_login>#<token>#<cod_prod>
+     */
+    public String compraProducto(String mensajeCliente) {
+        obtenerConexion();
+
+        String[] peticion = mensajeCliente.split("#");
+        String item = "";
+        String mensaje = "";
+        String sql;
+        boolean estaComprado = false;
+
+        try {
+            Statement statement = this.conexion.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM PRODUCTO WHERE codigo_producto='" + peticion[4] + "'");
+            while (resultSet.next()) {
+                item = resultSet.getString("login_compra");
+                System.err.println("DEBUGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG: " + item);
+                if (item.equals("null")) {
+                    estaComprado = false;
+                } else {
+                    estaComprado = true;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        if (estaComprado == false) {
+            sql = "UPDATE producto SET login_compra = '" + peticion[2] + "' WHERE codigo_producto = " + peticion[4];
+            try (PreparedStatement preparedStatement = this.conexion.prepareStatement(sql)) {
+                preparedStatement.executeUpdate();
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
+            }
+            mensaje = "PROTOCOLCRISTOPOP1.0#BUY_ACCEPTED#" + peticion[4] + "#" + peticion[2];
+
+            // si este producto se ha comprado, tendré que recorrer el array de hebras y llamar al metodo de estas hebras para enviar mensaje a clientes
+            for (int i = 0; i < Servidor.arrayHebrasServer.size(); i++) {
+                Servidor.arrayHebrasServer.get(i).itemASidoComprado(peticion[4], peticion[2]);
+            }
+        } else {
+            mensaje = "PROTOCOLOCRISTOPOP1.0#BUY_REJECTED#" + peticion[4] + "#" + peticion[2];
+        }
+
+        cerrarConexion();
 
         return mensaje;
     }

@@ -7,19 +7,21 @@ import java.util.ArrayList;
 public class Servidor {
 
     public static Ventana ventana = new Ventana();
+    public static ArrayList<HebraServer> arrayHebrasServer = new ArrayList<>();
     
     public static void main(String[] args) throws IOException {
 
-        ArrayList<Thread> socketsServidorCliente = new ArrayList<Thread>();
+        ArrayList<Thread> socketsServidorCliente = new ArrayList<>();
         int puerto = 4001;
         boolean listening = true;
         ventana.setVisible(true);
 
-        try (ServerSocket serverSocket = new ServerSocket(puerto)) { // creo el serverSocket
+        try (ServerSocket serverSocket = new ServerSocket(puerto)) {
             while (listening) {
-                HebraServer hebraServer = new HebraServer(serverSocket.accept(), ventana); //thread, le paso por parametro el socket
-                socketsServidorCliente.add(new Thread(hebraServer)); // añado hebra al array de hebras
-                socketsServidorCliente.get(socketsServidorCliente.size() - 1).start(); // inicio el thread
+                HebraServer hebraServer = new HebraServer(serverSocket.accept(), ventana);
+                arrayHebrasServer.add(hebraServer);
+                socketsServidorCliente.add(new Thread(hebraServer));
+                socketsServidorCliente.get(socketsServidorCliente.size() - 1).start();
             }
         } catch (IOException e) {
             System.err.println("Could not listen on port " + puerto);
@@ -27,7 +29,3 @@ public class Servidor {
         }
     }
 }
-/*
-    Tengo que crear la interfaz aqui e instanciarla en cada clase HebraServer para no crear una ventana nueva cada vez que creo un socket
-    igualar la ventana que le paso por parametros
-*/

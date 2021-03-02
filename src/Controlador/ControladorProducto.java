@@ -25,5 +25,9 @@ public class ControladorProducto {
         return mensaje;
     }
     
+    public String compraProducto(String mensajeCliente){
+        String mensaje = producto.compraProducto(mensajeCliente);
+        return mensaje;
+    }
 
 }

@@ -11,10 +11,10 @@ public class Protocolo {
     ControladorUsuario controladorUsuario;
     ControladorProducto controladorProducto;
     Ventana ventana;
-    
-    boolean enviaImagen=false;
-    boolean cargarArray=true;
-    int numero_paquete=0;
+
+    boolean enviaImagen = false;
+    boolean cargarArray = true;
+    int numero_paquete = 0;
 
     public Protocolo(Ventana ventana) {
         controladorUsuario = new ControladorUsuario();
@@ -32,13 +32,19 @@ public class Protocolo {
             case "LOGIN":
                 theOutput = controladorUsuario.verificaUsuario(mensaje);
                 respuesta = theOutput.split("#");
-                if (respuesta[1].equals("WELLCOME")) {ventana.areaTexto.append("Usuario logueado: " + respuesta[2] +"\n");} else{ventana.areaTexto.append("Error de logueo: " + peticion[2] + "\n");}
+                if (respuesta[1].equals("WELLCOME")) {
+                    ventana.areaTexto.append("Usuario logueado: " + respuesta[2] + "\n");
+                } else {
+                    ventana.areaTexto.append("Error de logueo: " + peticion[2] + "\n");
+                }
                 break;
             case "GET_PRODUCTS":
                 if (token(peticion[2]).equals(peticion[3])) {
                     theOutput = controladorProducto.dameProductos();
                     respuesta = theOutput.split("#");
-                    if (respuesta[1].equals("AVAILABLE_PRODUCTS")) {ventana.areaTexto.append("Usuario: " + peticion[2] +" está visualizando los productos"+"\n");}
+                    if (respuesta[1].equals("AVAILABLE_PRODUCTS")) {
+                        ventana.areaTexto.append("Usuario: " + peticion[2] + " está visualizando los productos" + "\n");
+                    }
                 } else {
                     theOutput = "PROTOCOLCRISTOPOP1.0#ERROR#CANT_GET_FILES";
                 }
@@ -47,7 +53,9 @@ public class Protocolo {
                 if (token(peticion[2]).equals(peticion[3])) {
                     theOutput = controladorProducto.dameItem(mensaje);
                     respuesta = theOutput.split("#");
-                    if (respuesta[1].equals("GET_ITEM")) {ventana.areaTexto.append("Usuario: " + peticion[2] +" está visualizando el producto "+respuesta[2]+"\n");}
+                    if (respuesta[1].equals("GET_ITEM")) {
+                        ventana.areaTexto.append("Usuario: " + peticion[2] + " está visualizando el producto " + respuesta[2] + "\n");
+                    }
                 } else {
                     theOutput = "PROTOCOLCRISTOPOP1.0#ERROR#CANT_GET_ITEM";
                 }
@@ -58,8 +66,11 @@ public class Protocolo {
                 }
                 break;
             case "BUY_PRODUCT":
-                System.out.println("Mensaje recibido");
-                ventana.areaTexto.append("El pobre usuario "+peticion[2]+" intenta comprar un ITEM que no se puede comprar porque aún no he implementado esta pta mierda \n");
+                if (token(peticion[2]).equals(peticion[3])) {
+                    theOutput = controladorProducto.compraProducto(mensaje);
+                    respuesta = theOutput.split("#");
+                    ventana.areaTexto.append("El usuario " + peticion[2] + " ha intendado comprar un ITEM " + respuesta[1] + "\n");
+                }
                 break;
         }
 

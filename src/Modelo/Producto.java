@@ -337,11 +337,12 @@ public class Producto extends Conexion {
                 System.out.println(e.getMessage());
             }
             mensaje = "PROTOCOLCRISTOPOP1.0#BUY_ACCEPTED#" + peticion[4] + "#" + peticion[2];
-
+            System.err.println("COMPRADOOOOOOOOOOOOOOO: " + item);
             // si este producto se ha comprado, tendré que recorrer el array de hebras y llamar al metodo de estas hebras para enviar mensaje a clientes
             for (int i = 0; i < Servidor.arrayHebrasServer.size(); i++) {
                 Servidor.arrayHebrasServer.get(i).itemASidoComprado(peticion[4], peticion[2]);
             }
+            System.err.println("RECORRIDOOOOOOOOOOOO");
         } else {
             mensaje = "PROTOCOLOCRISTOPOP1.0#BUY_REJECTED#" + peticion[4] + "#" + peticion[2];
         }

@@ -72,6 +72,12 @@ public class Protocolo {
                     ventana.areaTexto.append("El usuario " + peticion[2] + " ha intendado comprar un ITEM " + respuesta[1] + "\n");
                 }
                 break;
+            case "BYE":
+                if (token(peticion[2]).equals(peticion[3])) {
+                    theOutput = "PROTOCOLCRISTOPOP1.0#ADIOSXULO#"+peticion[2]+"#"+peticion[3];
+                    ventana.areaTexto.append("El usuario " + peticion[2] + " Se ha desconectado\n");
+                }
+                break;
         }
 
         return theOutput;

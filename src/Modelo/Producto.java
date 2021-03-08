@@ -340,6 +340,7 @@ public class Producto extends Conexion {
             System.err.println("COMPRADOOOOOOOOOOOOOOO: " + item);
             // si este producto se ha comprado, tendré que recorrer el array de hebras y llamar al metodo de estas hebras para enviar mensaje a clientes
             for (int i = 0; i < Servidor.arrayHebrasServer.size(); i++) {
+                // aqui tendria que poner el condicional que comprueba que el nombre de cada hilo es diferente al de quien se lo voy a enviar, y si se cumple llamo al método
                 Servidor.arrayHebrasServer.get(i).itemASidoComprado(peticion[4], peticion[2]);
             }
             System.err.println("RECORRIDOOOOOOOOOOOO");

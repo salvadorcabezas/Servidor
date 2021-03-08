@@ -14,6 +14,7 @@ public class HebraServer implements Runnable {
     PrintWriter out;
     BufferedReader in;
     boolean apagar = false;
+    String nombre; // tengo que añadirlo al constructor, tengo que crear metodo que devuelva nombre, de esta manera identificaré a los hilos, puede que tenga que crear ese metoddo como public static
 
     public HebraServer(Socket socket, Ventana ventana) throws IOException {
         this.socket = socket;
@@ -24,25 +25,25 @@ public class HebraServer implements Runnable {
 
     @Override
     public void run() {
-        String userAddress = socket.getRemoteSocketAddress().toString(); // METODO PARA OBTENER HOST Y PUERTO
-        //System.out.println("Usuario conectado: " + userAddress); // imprimo por pantalla el host y puerto
+        String userAddress = socket.getRemoteSocketAddress().toString();
         ventana.areaTexto.append("Usuario conectado: " + userAddress + "\n");
+        
         try {
             String inputLine, outputLine;
             Protocolo protocolo = new Protocolo(ventana);
 
-            while (((inputLine = in.readLine()) != null) && apagar == false) { // BUCLE INFINITO, leo lo que escribe el cliente
-                //DO WHILE ENVIAImagen==TRUE
-                do {
-                    outputLine = protocolo.processInput(inputLine); // le paso al protocolo el mensaje del cliente y almaceno la respuesta en el outputline
-                    out.println(outputLine); // envio la respuesta al cliente
+            while (((inputLine = in.readLine()) != null) && apagar == false) { // BUCLE INFINITO, leo lo que me manda el cliente
+                
+                do { //DO WHILE, mientras esté enviando una imagen
+                    outputLine = protocolo.processInput(inputLine);
+                    out.println(outputLine);
                 } while (protocolo.controladorProducto.producto.enviaImagen == true);
                 compruebaMensaje = inputLine.split("#");
                 if (compruebaMensaje[1].equals("BYE")) {
                     apagar = true;
                 }
             }
-            // BOOLEANO QUE ITERE TANTAS VECES HASTA QUE EL PROTOCOLO INDIQUE QUE YA SE HA ENVIADO LA IMAGEN, EL PROTOCOLO CAMBIARÁ EL BOLEANO
+            
             in.close();
             out.close();
             socket.close();
@@ -54,6 +55,7 @@ public class HebraServer implements Runnable {
         }
     }
 
+    // método que envia mensaje especifico al cliente de que un usuario a comprado
     public void itemASidoComprado(String codigoProducto, String userLogin) {
         out.println("PROTOCOLCRISTOPOP1.0#BUY_ACCEPTED#" + codigoProducto + "#" + userLogin);
     }

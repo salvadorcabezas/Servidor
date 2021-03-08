@@ -32,6 +32,7 @@ public class Protocolo {
             case "LOGIN":
                 theOutput = controladorUsuario.verificaUsuario(mensaje);
                 respuesta = theOutput.split("#");
+                System.out.println("El entrante a ingresado: " + theOutput);
                 if (respuesta[1].equals("WELLCOME")) {
                     ventana.areaTexto.append("Usuario logueado: " + respuesta[2] + "\n");
                 } else {
@@ -105,13 +106,3 @@ public class Protocolo {
         return sha;
     }
 }
-
-// primero llamo al protocolo desde la HebraServer pasandole el mensaje del cliente, y la conexion para que los controladores puedan acceder a la base de datos
-/* dentro del protocolo tendré los objetos controladores*/
-// divido ese mensaje en el protocolo para saber que tipo de peticion se ha solicitado
-// desde un menu swift llamaré a un metodo u otro de la clase controlador cliente o controlador producto
-// no podré acceder al resto de metodos si no se ha logueado, esto lo controlare con un booleano
-// cuando llame a un método, le pasare el String entero, el metodo se encargará de dividirlo y operar sobre la base de datos
-// los metodos devolverán un string al protocolo
-// el protocolo devolverá un string a la hebraServer
-// la hebra server devolverá la información al cliente

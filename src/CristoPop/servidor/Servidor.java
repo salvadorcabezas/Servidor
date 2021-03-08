@@ -12,7 +12,10 @@ public class Servidor {
     public static void main(String[] args) throws IOException {
 
         ArrayList<Thread> socketsServidorCliente = new ArrayList<>();
-        int puerto = 4001;
+        //socketsServidorCliente.get(0).setName(name); para introducir nombre
+        //socketsServidorCliente.get(0).interrupt(); para matar a la hebra
+        //socketsServidorCliente.get(0).getName(); para obtener nombre
+        int puerto = 5001;
         boolean listening = true;
         ventana.setVisible(true);
 
